@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0">
+
+<title>AI Playground</title>
+
+<style>
+
+:root {{
+    --bg: #07090d;
+    --panel: rgba(18,22,30,.82);
+    --panel2: rgba(24,29,39,.82);
+    --border: rgba(255,255,255,.09);
+    --text: #f5f7fb;
+    --muted: #8e98aa;
+    --accent: #7c8cff;
+    --accent2: #9c7cff;
+    --danger: #ff657a;
+    --shadow: 0 25px 80px rgba(0,0,0,.42);
+}}
+
+* {{
+    box-sizing:border-box;
+}}
+
+html,body {{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            rgba(124,140,255,.13),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 85% 85%,
+            rgba(156,124,255,.10),
+            transparent 35%
+        ),
+        var(--bg);
+    color:var(--text);
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}}
+
+button,
+input,
+textarea,
+select {{
+    font:inherit;
+}}
+
+button {{
+    cursor:pointer;
+}}
+
+#app {{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}}
+
+header {{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    border-bottom:1px solid var(--border);
+    background:rgba(7,9,13,.72);
+    backdrop-filter:blur(24px);
+    z-index:10;
+}}
+
+.brand {{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-weight:800;
+    letter-spacing:-.4px;
+}}
+
+.logo {{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    display:grid;
+    place-items:center;
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+    box-shadow:0 8px 30px rgba(124,140,255,.25);
+}}
+
+.header-actions {{
+    display:flex;
+    gap:8px;
+}}
+
+.icon-btn {{
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.045);
+    color:var(--text);
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    transition:.2s;
+}}
+
+.icon-btn:hover {{
+    background:rgba(255,255,255,.09);
+    transform:translateY(-1px);
+}}
+
+main {{
+    flex:1;
+    min-height:0;
+    display:flex;
+}}
+
+.sidebar {{
+    width:240px;
+    border-right:1px solid var(--border);
+    padding:18px 12px;
+    overflow:auto;
+    background:rgba(8,10,15,.52);
+}}
+
+.category {{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    text-align:left;
+    padding:10px 12px;
+    border-radius:10px;
+    margin-bottom:4px;
+    transition:.2s;
+}}
+
+.category:hover {{
+    color:var(--text);
+    background:rgba(255,255,255,.045);
+}}
+
+.category.active {{
+    color:var(--text);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(124,140,255,.16),
+            rgba(124,140,255,.04)
+        );
+}}
+
+.content {{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+}}
+
+.toolbar {{
+    padding:18px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+}}
+
+.search {{
+    flex:1;
+    height:48px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.045);
+    color:var(--text);
+    padding:0 16px;
+    outline:none;
+    transition:.2s;
+}}
+
+.search:focus {{
+    border-color:rgba(124,140,255,.5);
+    box-shadow:0 0 0 4px rgba(124,140,255,.08);
+}}
+
+.status {{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    height:48px;
+    padding:0 14px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    color:var(--muted);
+    font-size:13px;
+}}
+
+.dot {{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#666;
+}}
+
+.dot.online {{
+    background:#54e38e;
+    box-shadow:0 0 12px rgba(84,227,142,.6);
+}}
+
+.grid {{
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    padding:0 18px 24px;
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fill,minmax(220px,1fr));
+    gap:12px;
+    align-content:start;
+}}
+
+.card {{
+    min-height:130px;
+    padding:17px;
+    border:1px solid var(--border);
+    border-radius:17px;
+    background:var(--panel);
+    box-shadow:var(--shadow);
+    transition:
+        transform .22s ease,
+        border-color .22s ease,
+        background .22s ease;
+}}
+
+.card:hover {{
+    transform:translateY(-3px);
+    border-color:rgba(255,255,255,.15);
+    background:var(--panel2);
+}}
+
+.card-top {{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+}}
+
+.card-icon {{
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    display:grid;
+    place-items:center;
+    background:rgba(124,140,255,.12);
+    color:#aeb8ff;
+}}
+
+.card h3 {{
+    margin:13px 0 5px;
+    font-size:15px;
+}}
+
+.card p {{
+    margin:0;
+    color:var(--muted);
+    line-height:1.45;
+    font-size:12px;
+}}
+
+.launch {{
+    margin-top:15px;
+    width:100%;
+    height:34px;
+    border-radius:9px;
+    border:1px solid rgba(124,140,255,.25);
+    color:white;
+    background:rgba(124,140,255,.12);
+    transition:.2s;
+}}
+
+.launch:hover {{
+    background:rgba(124,140,255,.22);
+}}
+
+.workspace {{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    pointer-events:none;
+}}
+
+.widget-window {{
+    position:absolute;
+    width:min(560px,calc(100vw - 30px));
+    max-height:calc(100vh - 30px);
+    overflow:auto;
+    pointer-events:auto;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,30,41,.97),
+            rgba(12,15,22,.97)
+        );
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:20px;
+    box-shadow:0 35px 100px rgba(0,0,0,.6);
+    padding:18px;
+    animation:pop .22s ease;
+}}
+
+@keyframes pop {{
+    from {{
+        opacity:0;
+        transform:scale(.97) translateY(8px);
+    }}
+    to {{
+        opacity:1;
+        transform:none;
+    }}
+}}
+
+.window-head {{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:15px;
+}}
+
+.window-title {{
+    font-weight:750;
+}}
+
+.close {{
+    width:34px;
+    height:34px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:rgba(255,255,255,.05);
+    color:white;
+}}
+
+.tool-input {{
+    width:100%;
+    min-height:44px;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:rgba(0,0,0,.2);
+    color:white;
+    padding:11px;
+    outline:none;
+    margin-bottom:10px;
+}}
+
+.tool-button {{
+    min-height:42px;
+    padding:0 15px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(
+        135deg,
+        var(--accent),
+        var(--accent2)
+    );
+    color:white;
+    font-weight:700;
+}}
+
+.result {{
+    margin-top:12px;
+    padding:13px;
+    border-radius:11px;
+    background:rgba(255,255,255,.045);
+    color:#dce2ee;
+    white-space:pre-wrap;
+}}
+
+.toast {{
+    position:fixed;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%) translateY(15px);
+    opacity:0;
+    pointer-events:none;
+    z-index:100;
+    padding:11px 15px;
+    border-radius:12px;
+    background:#161b25;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    transition:.25s;
+}}
+
+.toast.show {{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}}
+
+.empty {{
+    grid-column:1/-1;
+    padding:60px 20px;
+    text-align:center;
+    color:var(--muted);
+}}
+
+@media(max-width:800px) {{
+    .sidebar {{
+        width:190px;
+    }}
+}}
+
+@media(max-width:620px) {{
+    .sidebar {{
+        display:none;
+    }}
+
+    header {{
+        padding:0 14px;
+    }}
+
+    .toolbar {{
+        padding:12px;
+    }}
+
+    .grid {{
+        padding:0 12px 18px;
+    }}
+}}
+
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<header>
+
+    <div class="brand">
+        <div class="logo">✦</div>
+        <div>AI Playground</div>
+    </div>
+
+    <div class="header-actions">
+        <button
+            class="icon-btn"
+            id="bridgeBtn"
+            title="Check AI bridge"
+        >⌁</button>
+
+        <button
+            class="icon-btn"
+            id="settingsBtn"
+            title="Settings"
+        >⚙</button>
+    </div>
+
+</header>
+
+<main>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <section class="content">
+
+        <div class="toolbar">
+
+            <input
+                id="search"
+                class="search"
+                placeholder="Search widgets or type a command..."
+                autocomplete="off"
+            >
+
+            <div class="status">
+                <span class="dot" id="statusDot"></span>
+                <span id="statusText">Bridge offline</span>
+            </div>
+
+        </div>
+
+        <div
+            id="grid"
+            class="grid"
+        ></div>
+
+    </section>
+
+</main>
+
+</div>
+
+<div
+    id="workspace"
+    class="workspace"
+></div>
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+<script>
+
+const WIDGETS = [{"id": "calculator", "name": "Calculator", "description": "Calculate mathematical expressions", "category": "Math"}, {"id": "percentage", "name": "Percentage Calculator", "description": "Calculate percentages", "category": "Math"}, {"id": "fraction", "name": "Fraction Calculator", "description": "Work with fractions", "category": "Math"}, {"id": "quadratic", "name": "Quadratic Solver", "description": "Solve quadratic equations", "category": "Math"}, {"id": "prime", "name": "Prime Checker", "description": "Check whether numbers are prime", "category": "Math"}, {"id": "factor", "name": "Factor Finder", "description": "Find factors", "category": "Math"}, {"id": "gcd", "name": "GCD Calculator", "description": "Calculate greatest common divisor", "category": "Math"}, {"id": "lcm", "name": "LCM Calculator", "description": "Calculate least common multiple", "category": "Math"}, {"id": "average", "name": "Average Calculator", "description": "Calculate averages", "category": "Math"}, {"id": "statistics", "name": "Statistics", "description": "Calculate statistics", "category": "Math"}, {"id": "random_number", "name": "Random Number", "description": "Generate random numbers", "category": "Math"}, {"id": "dice", "name": "Dice Roller", "description": "Roll dice", "category": "Math"}, {"id": "coin", "name": "Coin Flip", "description": "Flip a virtual coin", "category": "Math"}, {"id": "timer", "name": "Timer", "description": "Countdown timer", "category": "Productivity"}, {"id": "stopwatch", "name": "Stopwatch", "description": "Precision stopwatch", "category": "Productivity"}, {"id": "clock", "name": "Clock", "description": "Current local time", "category": "Productivity"}, {"id": "world_clock", "name": "World Clock", "description": "Time in other locations", "category": "Productivity"}, {"id": "calendar", "name": "Calendar", "description": "Calendar interface", "category": "Productivity"}, {"id": "notes", "name": "Notes", "description": "Persistent notes", "category": "Productivity"}, {"id": "todo", "name": "To-Do List", "description": "Task manager", "category": "Productivity"}, {"id": "pomodoro", "name": "Pomodoro", "description": "Pomodoro focus timer", "category": "Productivity"}, {"id": "counter", "name": "Counter", "description": "Simple counter", "category": "Productivity"}, {"id": "checklist", "name": "Checklist", "description": "Interactive checklist", "category": "Productivity"}, {"id": "text_counter", "name": "Text Counter", "description": "Count words and characters", "category": "Productivity"}, {"id": "length", "name": "Length Converter", "description": "Convert length units", "category": "Converters"}, {"id": "weight", "name": "Weight Converter", "description": "Convert weight units", "category": "Converters"}, {"id": "temperature", "name": "Temperature Converter", "description": "Convert temperature", "category": "Converters"}, {"id": "speed", "name": "Speed Converter", "description": "Convert speed", "category": "Converters"}, {"id": "area", "name": "Area Converter", "description": "Convert area", "category": "Converters"}, {"id": "volume", "name": "Volume Converter", "description": "Convert volume", "category": "Converters"}, {"id": "time_conversion", "name": "Time Converter", "description": "Convert time", "category": "Converters"}, {"id": "data", "name": "Data Converter", "description": "Convert data units", "category": "Converters"}, {"id": "currency", "name": "Currency Converter", "description": "Convert currencies", "category": "Converters"}, {"id": "json", "name": "JSON Formatter", "description": "Format JSON", "category": "Developer"}, {"id": "base64", "name": "Base64", "description": "Encode/decode Base64", "category": "Developer"}, {"id": "url_encode", "name": "URL Encoder", "description": "Encode URLs", "category": "Developer"}, {"id": "uuid", "name": "UUID Generator", "description": "Generate UUIDs", "category": "Developer"}, {"id": "hash", "name": "Hash Generator", "description": "Generate hashes", "category": "Developer"}, {"id": "regex", "name": "Regex Tester", "description": "Test regular expressions", "category": "Developer"}, {"id": "timestamp", "name": "Unix Timestamp", "description": "Convert Unix timestamps", "category": "Developer"}, {"id": "jwt", "name": "JWT Decoder", "description": "Decode JWT payloads", "category": "Developer"}, {"id": "html_escape", "name": "HTML Escape", "description": "Escape HTML", "category": "Developer"}, {"id": "css_minify", "name": "CSS Minifier", "description": "Minify CSS", "category": "Developer"}, {"id": "js_minify", "name": "JavaScript Minifier", "description": "Minify JavaScript", "category": "Developer"}, {"id": "color", "name": "Color Converter", "description": "Convert colors", "category": "Developer"}, {"id": "qr", "name": "QR Generator", "description": "Generate QR codes", "category": "Developer"}, {"id": "website", "name": "Website Launcher", "description": "Open a website", "category": "Web"}, {"id": "web_search", "name": "Web Search", "description": "Search the web", "category": "Web"}, {"id": "youtube", "name": "YouTube", "description": "Open YouTube", "category": "Web"}, {"id": "youtube_search", "name": "YouTube Search", "description": "Search YouTube", "category": "Web"}, {"id": "google", "name": "Google", "description": "Open Google", "category": "Web"}, {"id": "maps", "name": "Google Maps", "description": "Open Google Maps", "category": "Web"}, {"id": "gmail", "name": "Gmail", "description": "Open Gmail", "category": "Web"}, {"id": "drive", "name": "Google Drive", "description": "Open Google Drive", "category": "Web"}, {"id": "docs", "name": "Google Docs", "description": "Open Google Docs", "category": "Web"}, {"id": "sheets", "name": "Google Sheets", "description": "Open Google Sheets", "category": "Web"}, {"id": "teams", "name": "Microsoft Teams", "description": "Open Microsoft Teams", "category": "Microsoft"}, {"id": "outlook", "name": "Outlook", "description": "Open Outlook", "category": "Microsoft"}, {"id": "onedrive", "name": "OneDrive", "description": "Open OneDrive", "category": "Microsoft"}, {"id": "office", "name": "Microsoft 365", "description": "Open Microsoft 365", "category": "Microsoft"}, {"id": "word", "name": "Word Online", "description": "Open Word", "category": "Microsoft"}, {"id": "excel", "name": "Excel Online", "description": "Open Excel", "category": "Microsoft"}, {"id": "powerpoint", "name": "PowerPoint Online", "description": "Open PowerPoint", "category": "Microsoft"}, {"id": "drawing", "name": "Drawing Board", "description": "Draw on a canvas", "category": "Creative"}, {"id": "color_picker", "name": "Color Picker", "description": "Pick colors", "category": "Creative"}, {"id": "gradient", "name": "Gradient Generator", "description": "Generate gradients", "category": "Creative"}, {"id": "lorem", "name": "Lorem Ipsum", "description": "Generate placeholder text", "category": "Creative"}, {"id": "password", "name": "Password Generator", "description": "Generate secure passwords", "category": "Creative"}, {"id": "text_case", "name": "Text Case", "description": "Transform text case", "category": "Creative"}, {"id": "text_cleaner", "name": "Text Cleaner", "description": "Clean text", "category": "Creative"}, {"id": "ascii", "name": "ASCII Art", "description": "Create ASCII art", "category": "Creative"}, {"id": "csv", "name": "CSV Viewer", "description": "View CSV data", "category": "Data"}, {"id": "table", "name": "Table Builder", "description": "Create tables", "category": "Data"}, {"id": "json_tree", "name": "JSON Tree", "description": "Explore JSON", "category": "Data"}, {"id": "data_generator", "name": "Data Generator", "description": "Generate sample data", "category": "Data"}, {"id": "sorter", "name": "Data Sorter", "description": "Sort data", "category": "Data"}, {"id": "deduplicator", "name": "Deduplicator", "description": "Remove duplicate lines", "category": "Data"}, {"id": "flashcards", "name": "Flashcards", "description": "Study flashcards", "category": "Education"}, {"id": "quiz", "name": "Quiz", "description": "Create a quiz", "category": "Education"}, {"id": "random_choice", "name": "Random Choice", "description": "Choose randomly", "category": "Education"}, {"id": "study_timer", "name": "Study Timer", "description": "Study timer", "category": "Education"}, {"id": "unit_reference", "name": "Unit Reference", "description": "Unit reference", "category": "Education"}, {"id": "periodic_table", "name": "Periodic Table", "description": "Explore elements", "category": "Education"}, {"id": "distance", "name": "Distance Tool", "description": "Estimate distance", "category": "Travel"}, {"id": "timezone", "name": "Timezone Tool", "description": "Compare timezones", "category": "Travel"}, {"id": "maps_route", "name": "Route Planner", "description": "Open route planning", "category": "Travel"}, {"id": "travel_search", "name": "Travel Search", "description": "Search travel information", "category": "Travel"}, {"id": "youtube_embed", "name": "YouTube Player", "description": "Play YouTube content", "category": "Media"}, {"id": "image_search", "name": "Image Search", "description": "Search images", "category": "Media"}, {"id": "video_search", "name": "Video Search", "description": "Search videos", "category": "Media"}, {"id": "music_search", "name": "Music Search", "description": "Search music", "category": "Media"}, {"id": "reaction", "name": "Reaction Test", "description": "Test reaction speed", "category": "Games"}, {"id": "clicker", "name": "Clicker", "description": "Clicking game", "category": "Games"}, {"id": "memory", "name": "Memory Game", "description": "Memory matching game", "category": "Games"}, {"id": "snake", "name": "Snake", "description": "Snake game", "category": "Games"}, {"id": "tic_tac_toe", "name": "Tic-Tac-Toe", "description": "Tic-tac-toe", "category": "Games"}, {"id": "rock_paper_scissors", "name": "Rock Paper Scissors", "description": "Play RPS", "category": "Games"}, {"id": "number_guess", "name": "Number Guess", "description": "Guess the number", "category": "Games"}, {"id": "ai_chat", "name": "AI Chat", "description": "Chat with the AI", "category": "AI"}, {"id": "ai_summarizer", "name": "AI Summarizer", "description": "Summarize text", "category": "AI"}, {"id": "ai_writer", "name": "AI Writer", "description": "Generate writing", "category": "AI"}, {"id": "ai_brainstorm", "name": "AI Brainstorm", "description": "Brainstorm ideas", "category": "AI"}, {"id": "ai_explainer", "name": "AI Explainer", "description": "Explain concepts", "category": "AI"}, {"id": "browser_info", "name": "Browser Information", "description": "View browser information", "category": "System"}, {"id": "screen_info", "name": "Screen Information", "description": "View screen information", "category": "System"}, {"id": "fullscreen", "name": "Fullscreen", "description": "Toggle fullscreen", "category": "System"}, {"id": "online_status", "name": "Connection Status", "description": "Check connection", "category": "System"}, {"id": "bridge_status", "name": "Bridge Status", "description": "Check local AI bridge", "category": "System"}, {"id": "invoice", "name": "Invoice Builder", "description": "Build invoices", "category": "Business"}, {"id": "tax", "name": "Tax Calculator", "description": "Calculate taxes", "category": "Business"}, {"id": "tip", "name": "Tip Calculator", "description": "Calculate tips", "category": "Business"}, {"id": "loan", "name": "Loan Calculator", "description": "Calculate loans", "category": "Business"}, {"id": "profit", "name": "Profit Calculator", "description": "Calculate profit", "category": "Business"}];
+
+const BRIDGE =
+    localStorage.getItem("ai_playground_bridge")
+    || "http://127.0.0.1:8765";
+
+let currentCategory = "All";
+
+const workspace =
+    document.getElementById("workspace");
+
+const grid =
+    document.getElementById("grid");
+
+const sidebar =
+    document.getElementById("sidebar");
+
+const search =
+    document.getElementById("search");
+
+const toast =
+    document.getElementById("toast");
+
+function showToast(message) {{
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(
+        () => toast.classList.remove("show"),
+        2200
+    );
+}}
+
+function iconFor(category) {{
+
+    const icons = {{
+        Math:"∑",
+        Productivity:"✓",
+        Converters:"↔",
+        Developer:"<>",
+        Web:"⌁",
+        Microsoft:"▦",
+        Creative:"✦",
+        Data:"▤",
+        Education:"◇",
+        Travel:"⌖",
+        Media:"▶",
+        Games:"♟",
+        AI:"✧",
+        System:"⚙",
+        Business:"$"
+    }};
+
+    return icons[category] || "•";
+}}
+
+function buildSidebar() {{
+
+    const categories = [
+        "All",
+        ...new Set(
+            WIDGETS.map(x => x.category)
+        )
+    ];
+
+    sidebar.innerHTML = categories.map(
+        category => `
+            <button
+                class="category ${{category === currentCategory ? "active" : ""}}"
+                data-category="${{category}}"
+            >
+                ${{category}}
+            </button>
+        `
+    ).join("");
+
+    sidebar
+        .querySelectorAll(".category")
+        .forEach(button => {{
+
+            button.addEventListener(
+                "click",
+                () => {{
+
+                    currentCategory =
+                        button.dataset.category;
+
+                    buildSidebar();
+                    render();
+
+                }}
+            );
+
+        }});
+}}
+
+function render() {{
+
+    const query =
+        search.value.trim().toLowerCase();
+
+    const filtered =
+        WIDGETS.filter(widget => {{
+
+            const categoryMatch =
+                currentCategory === "All"
+                || widget.category === currentCategory;
+
+            const text =
+                (
+                    widget.name
+                    + " "
+                    + widget.description
+                    + " "
+                    + widget.category
+                ).toLowerCase();
+
+            return categoryMatch
+                && text.includes(query);
+        }});
+
+    if (!filtered.length) {{
+
+        grid.innerHTML = `
+            <div class="empty">
+                No widgets found.
+            </div>
+        `;
+
+        return;
+    }}
+
+    grid.innerHTML = filtered.map(widget => `
+
+        <article class="card">
+
+            <div class="card-top">
+
+                <div class="card-icon">
+                    ${{iconFor(widget.category)}}
+                </div>
+
+            </div>
+
+            <h3>${{widget.name}}</h3>
+
+            <p>${{widget.description}}</p>
+
+            <button
+                class="launch"
+                data-widget="${{widget.id}}"
+            >
+                Open
+            </button>
+
+        </article>
+
+    `).join("");
+
+    grid
+        .querySelectorAll(".launch")
+        .forEach(button => {{
+
+            button.addEventListener(
+                "click",
+                () => openWidget(button.dataset.widget)
+            );
+
+        }});
+}}
+
+function centerWindow(windowElement) {{
+
+    const width =
+        window.innerWidth;
+
+    const height =
+        window.innerHeight;
+
+    const rect =
+        windowElement.getBoundingClientRect();
+
+    windowElement.style.left =
+        Math.max(
+            15,
+            (width - rect.width) / 2
+        ) + "px";
+
+    windowElement.style.top =
+        Math.max(
+            15,
+            (height - rect.height) / 2
+        ) + "px";
+}}
+
+function openWidget(id) {{
+
+    const widget =
+        WIDGETS.find(x => x.id === id);
+
+    if (!widget) return;
+
+    const win =
+        document.createElement("div");
+
+    win.className =
+        "widget-window";
+
+    win.innerHTML = `
+
+        <div class="window-head">
+
+            <div class="window-title">
+                ${{widget.name}}
+            </div>
+
+            <button class="close">
+                ×
+            </button>
+
+        </div>
+
+        <div class="widget-body"></div>
+
+    `;
+
+    workspace.appendChild(win);
+
+    win.querySelector(".close")
+        .onclick = () => win.remove();
+
+    const body =
+        win.querySelector(".widget-body");
+
+    buildWidgetBody(
+        id,
+        body,
+        win
+    );
+
+    requestAnimationFrame(
+        () => centerWindow(win)
+    );
+}}
+
+function buildWidgetBody(id, body, win) {{
+
+    if (id === "calculator") {{
+
+        body.innerHTML = `
+
+            <input
+                id="calcInput"
+                class="tool-input"
+                placeholder="Example: (12 + 8) * 3"
+            >
+
+            <button
+                id="calcButton"
+                class="tool-button"
+            >
+                Calculate
+            </button>
+
+            <div
+                id="calcResult"
+                class="result"
+            ></div>
+        `;
+
+        const input =
+            body.querySelector("#calcInput");
+
+        const result =
+            body.querySelector("#calcResult");
+
+        body.querySelector("#calcButton")
+            .onclick = () => {{
+
+                try {{
+
+                    const expression =
+                        input.value
+                            .replace(/[^0-9+\-*/().%\s]/g,"");
+
+                    result.textContent =
+                        String(
+                            Function(
+                                '"use strict";return (' +
+                                expression +
+                                ')'
+                            )()
+                        );
+
+                }} catch(e) {{
+
+                    result.textContent =
+                        "Invalid expression.";
+
+                }}
+
+            }};
+
+        input.focus();
+
+        return;
+    }}
+
+    if (id === "timer") {{
+
+        body.innerHTML = `
+
+            <input
+                id="timerInput"
+                class="tool-input"
+                type="number"
+                min="1"
+                placeholder="Seconds"
+            >
+
+            <button
+                id="timerStart"
+                class="tool-button"
+            >
+                Start
+            </button>
+
+            <div
+                id="timerResult"
+                class="result"
+            >Ready.</div>
+        `;
+
+        let interval = null;
+        let remaining = 0;
+
+        const input =
+            body.querySelector("#timerInput");
+
+        const result =
+            body.querySelector("#timerResult");
+
+        body.querySelector("#timerStart")
+            .onclick = () => {{
+
+                clearInterval(interval);
+
+                remaining =
+                    Number(input.value);
+
+                if (!remaining || remaining < 1)
+                    return;
+
+                result.textContent =
+                    remaining + "s";
+
+                interval =
+                    setInterval(() => {{
+
+                        remaining--;
+
+                        result.textContent =
+                            remaining + "s";
+
+                        if (remaining <= 0) {{
+
+                            clearInterval(interval);
+
+                            result.textContent =
+                                "Time's up!";
+
+                            showToast(
+                                "Timer finished"
+                            );
+                        }}
+
+                    }}, 1000);
+
+            }};
+
+        return;
+    }}
+
+    if (id === "stopwatch") {{
+
+        body.innerHTML = `
+
+            <div
+                id="stopwatchResult"
+                class="result"
+            >00:00.000</div>
+
+            <br>
+
+            <button
+                id="stopwatchStart"
+                class="tool-button"
+            >
+                Start
+            </button>
+        `;
+
+        let started = false;
+        let startTime = 0;
+        let elapsed = 0;
+        let interval = null;
+
+        const result =
+            body.querySelector(
+                "#stopwatchResult"
+            );
+
+        body.querySelector(
+            "#stopwatchStart"
+        ).onclick = () => {{
+
+            if (!started) {{
+
+                started = true;
+                startTime =
+                    performance.now() - elapsed;
+
+                interval =
+                    setInterval(() => {{
+
+                        elapsed =
+                            performance.now() - startTime;
+
+                        result.textContent =
+                            formatStopwatch(elapsed);
+
+                    }}, 20);
+
+                body.querySelector(
+                    "#stopwatchStart"
+                ).textContent = "Stop";
+
+            }} else {{
+
+                started = false;
+
+                clearInterval(interval);
+
+                body.querySelector(
+                    "#stopwatchStart"
+                ).textContent = "Start";
+            }}
+
+        }};
+
+        return;
+    }}
+
+    if (id === "notes") {{
+
+        body.innerHTML = `
+
+            <textarea
+                id="notesArea"
+                class="tool-input"
+                style="height:240px"
+                placeholder="Your notes..."
+            ></textarea>
+
+            <button
+                id="saveNotes"
+                class="tool-button"
+            >
+                Save
+            </button>
+        `;
+
+        const area =
+            body.querySelector("#notesArea");
+
+        area.value =
+            localStorage.getItem(
+                "ai_playground_notes"
+            ) || "";
+
+        body.querySelector("#saveNotes")
+            .onclick = () => {{
+
+                localStorage.setItem(
+                    "ai_playground_notes",
+                    area.value
+                );
+
+                showToast("Notes saved");
+            }};
+
+        return;
+    }}
+
+    if (id === "todo") {{
+
+        body.innerHTML = `
+
+            <input
+                id="todoInput"
+                class="tool-input"
+                placeholder="Add a task..."
+            >
+
+            <button
+                id="todoAdd"
+                class="tool-button"
+            >
+                Add
+            </button>
+
+            <div
+                id="todoList"
+                class="result"
+            ></div>
+        `;
+
+        const key =
+            "ai_playground_todos";
+
+        let todos =
+            JSON.parse(
+                localStorage.getItem(key)
+                || "[]"
+            );
+
+        const input =
+            body.querySelector("#todoInput");
+
+        const list =
+            body.querySelector("#todoList");
+
+        function renderTodos() {{
+
+            list.innerHTML =
+                todos.length
+                ? todos.map(
+                    (todo,index) =>
+                    `<div style="margin:7px 0">
+                        <label>
+                            <input
+                                type="checkbox"
+                                data-index="${{index}}"
+                                ${{todo.done ? "checked" : ""}}
+                            >
+                            <span
+                                style="${{
+                                    todo.done
+                                    ? "text-decoration:line-through;opacity:.5"
+                                    : ""
+                                }}"
+                            >
+                                ${{escapeHtml(todo.text)}}
+                            </span>
+                        </label>
+                    </div>`
+                ).join("")
+                : "No tasks yet.";
+
+            list
+                .querySelectorAll(
+                    "input[type=checkbox]"
+                )
+                .forEach(check => {{
+
+                    check.onchange = () => {{
+
+                        todos[
+                            Number(check.dataset.index)
+                        ].done =
+                            check.checked;
+
+                        localStorage.setItem(
+                            key,
+                            JSON.stringify(todos)
+                        );
+
+                        renderTodos();
+                    }};
+                }});
+        }}
+
+        body.querySelector("#todoAdd")
+            .onclick = () => {{
+
+                const value =
+                    input.value.trim();
+
+                if (!value) return;
+
+                todos.push({
+                    text:value,
+                    done:false
+                });
+
+                input.value = "";
+
+                localStorage.setItem(
+                    key,
+                    JSON.stringify(todos)
+                );
+
+                renderTodos();
+            }};
+
+        renderTodos();
+
+        return;
+    }}
+
+    if (id === "random_number") {{
+
+        body.innerHTML = `
+
+            <input
+                id="randomMin"
+                class="tool-input"
+                type="number"
+                placeholder="Minimum"
+                value="1"
+            >
+
+            <input
+                id="randomMax"
+                class="tool-input"
+                type="number"
+                placeholder="Maximum"
+                value="100"
+            >
+
+            <button
+                id="randomButton"
+                class="tool-button"
+            >
+                Generate
+            </button>
+
+            <div
+                id="randomResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#randomButton"
+        ).onclick = () => {{
+
+            const min =
+                Number(
+                    body.querySelector(
+                        "#randomMin"
+                    ).value
+                );
+
+            const max =
+                Number(
+                    body.querySelector(
+                        "#randomMax"
+                    ).value
+                );
+
+            const value =
+                Math.floor(
+                    Math.random()
+                    * (max - min + 1)
+                ) + min;
+
+            body.querySelector(
+                "#randomResult"
+            ).textContent = value;
+        }};
+
+        return;
+    }}
+
+    if (id === "dice") {{
+
+        body.innerHTML = `
+
+            <input
+                id="diceSides"
+                class="tool-input"
+                type="number"
+                value="6"
+                min="2"
+            >
+
+            <button
+                id="diceButton"
+                class="tool-button"
+            >
+                Roll
+            </button>
+
+            <div
+                id="diceResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#diceButton"
+        ).onclick = () => {{
+
+            const sides =
+                Math.max(
+                    2,
+                    Number(
+                        body.querySelector(
+                            "#diceSides"
+                        ).value
+                    )
+                );
+
+            body.querySelector(
+                "#diceResult"
+            ).textContent =
+                "🎲 " +
+                (
+                    Math.floor(
+                        Math.random() * sides
+                    ) + 1
+                );
+        }};
+
+        return;
+    }}
+
+    if (id === "coin") {{
+
+        body.innerHTML = `
+
+            <button
+                id="coinButton"
+                class="tool-button"
+            >
+                Flip Coin
+            </button>
+
+            <div
+                id="coinResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#coinButton"
+        ).onclick = () => {{
+
+            body.querySelector(
+                "#coinResult"
+            ).textContent =
+                Math.random() < .5
+                ? "Heads"
+                : "Tails";
+        }};
+
+        return;
+    }}
+
+    if (id === "uuid") {{
+
+        body.innerHTML = `
+
+            <button
+                id="uuidButton"
+                class="tool-button"
+            >
+                Generate UUID
+            </button>
+
+            <div
+                id="uuidResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#uuidButton"
+        ).onclick = () => {{
+
+            body.querySelector(
+                "#uuidResult"
+            ).textContent =
+                crypto.randomUUID();
+        }};
+
+        return;
+    }}
+
+    if (id === "password") {{
+
+        body.innerHTML = `
+
+            <input
+                id="passwordLength"
+                class="tool-input"
+                type="number"
+                min="4"
+                max="100"
+                value="20"
+            >
+
+            <button
+                id="passwordButton"
+                class="tool-button"
+            >
+                Generate Password
+            </button>
+
+            <div
+                id="passwordResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#passwordButton"
+        ).onclick = () => {{
+
+            const length =
+                Math.min(
+                    100,
+                    Math.max(
+                        4,
+                        Number(
+                            body.querySelector(
+                                "#passwordLength"
+                            ).value
+                        )
+                    )
+                );
+
+            const chars =
+                "ABCDEFGHJKLMNPQRSTUVWXYZ" +
+                "abcdefghijkmnopqrstuvwxyz" +
+                "23456789!@#$%^&*_-+=";
+
+            let result = "";
+
+            for (
+                let i = 0;
+                i < length;
+                i++
+            ) {{
+                result +=
+                    chars[
+                        Math.floor(
+                            Math.random()
+                            * chars.length
+                        )
+                    ];
+            }}
+
+            body.querySelector(
+                "#passwordResult"
+            ).textContent = result;
+        }};
+
+        return;
+    }}
+
+    if (id === "json") {{
+
+        body.innerHTML = `
+
+            <textarea
+                id="jsonInput"
+                class="tool-input"
+                style="height:180px"
+                placeholder='{{"hello":"world"}}'
+            ></textarea>
+
+            <button
+                id="jsonButton"
+                class="tool-button"
+            >
+                Format JSON
+            </button>
+
+            <div
+                id="jsonResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#jsonButton"
+        ).onclick = () => {{
+
+            try {{
+
+                const parsed =
+                    JSON.parse(
+                        body.querySelector(
+                            "#jsonInput"
+                        ).value
+                    );
+
+                body.querySelector(
+                    "#jsonResult"
+                ).textContent =
+                    JSON.stringify(
+                        parsed,
+                        null,
+                        2
+                    );
+
+            }} catch(e) {{
+
+                body.querySelector(
+                    "#jsonResult"
+                ).textContent =
+                    "Invalid JSON.";
+            }}
+        }};
+
+        return;
+    }}
+
+    if (id === "base64") {{
+
+        body.innerHTML = `
+
+            <textarea
+                id="base64Input"
+                class="tool-input"
+                style="height:150px"
+                placeholder="Text"
+            ></textarea>
+
+            <button
+                id="base64Encode"
+                class="tool-button"
+            >
+                Encode
+            </button>
+
+            <button
+                id="base64Decode"
+                class="tool-button"
+            >
+                Decode
+            </button>
+
+            <div
+                id="base64Result"
+                class="result"
+            ></div>
+        `;
+
+        const input =
+            body.querySelector("#base64Input");
+
+        const result =
+            body.querySelector("#base64Result");
+
+        body.querySelector(
+            "#base64Encode"
+        ).onclick = () => {{
+
+            result.textContent =
+                btoa(
+                    unescape(
+                        encodeURIComponent(
+                            input.value
+                        )
+                    )
+                );
+        }};
+
+        body.querySelector(
+            "#base64Decode"
+        ).onclick = () => {{
+
+            try {{
+
+                result.textContent =
+                    decodeURIComponent(
+                        escape(
+                            atob(input.value)
+                        )
+                    );
+
+            }} catch(e) {{
+
+                result.textContent =
+                    "Invalid Base64.";
+            }}
+        }};
+
+        return;
+    }}
+
+    if (id === "website") {{
+
+        body.innerHTML = `
+
+            <input
+                id="websiteInput"
+                class="tool-input"
+                placeholder="https://example.com"
+            >
+
+            <button
+                id="websiteButton"
+                class="tool-button"
+            >
+                Open
+            </button>
+        `;
+
+        body.querySelector(
+            "#websiteButton"
+        ).onclick = () => {{
+
+            let url =
+                body.querySelector(
+                    "#websiteInput"
+                ).value.trim();
+
+            if (!url) return;
+
+            if (!/^https?:\/\//i.test(url))
+                url = "https://" + url;
+
+            window.open(
+                url,
+                "_blank",
+                "noopener,noreferrer"
+            );
+        }};
+
+        return;
+    }}
+
+    if (id === "youtube") {{
+
+        body.innerHTML = `
+
+            <button
+                class="tool-button"
+                id="youtubeButton"
+            >
+                Open YouTube
+            </button>
+        `;
+
+        body.querySelector(
+            "#youtubeButton"
+        ).onclick = () => {{
+
+            window.open(
+                "https://www.youtube.com/",
+                "_blank",
+                "noopener,noreferrer"
+            );
+        }};
+
+        return;
+    }}
+
+    if (id === "youtube_search") {{
+
+        body.innerHTML = `
+
+            <input
+                id="youtubeSearch"
+                class="tool-input"
+                placeholder="Search YouTube..."
+            >
+
+            <button
+                id="youtubeSearchButton"
+                class="tool-button"
+            >
+                Search
+            </button>
+        `;
+
+        body.querySelector(
+            "#youtubeSearchButton"
+        ).onclick = () => {{
+
+            const q =
+                body.querySelector(
+                    "#youtubeSearch"
+                ).value.trim();
+
+            if (!q) return;
+
+            window.open(
+                "https://www.youtube.com/results?search_query="
+                + encodeURIComponent(q),
+                "_blank",
+                "noopener,noreferrer"
+            );
+        }};
+
+        return;
+    }}
+
+    if (id === "web_search") {{
+
+        body.innerHTML = `
+
+            <input
+                id="webSearch"
+                class="tool-input"
+                placeholder="Search the web..."
+            >
+
+            <button
+                id="webSearchButton"
+                class="tool-button"
+            >
+                Search
+            </button>
+        `;
+
+        body.querySelector(
+            "#webSearchButton"
+        ).onclick = () => {{
+
+            const q =
+                body.querySelector(
+                    "#webSearch"
+                ).value.trim();
+
+            if (!q) return;
+
+            window.open(
+                "https://www.google.com/search?q="
+                + encodeURIComponent(q),
+                "_blank",
+                "noopener,noreferrer"
+            );
+        }};
+
+        return;
+    }}
+
+    if (id === "google") {{
+        window.open(
+            "https://www.google.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Google opened.</div>";
+        return;
+    }}
+
+    if (id === "maps") {{
+        window.open(
+            "https://maps.google.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Google Maps opened.</div>";
+        return;
+    }}
+
+    if (id === "gmail") {{
+        window.open(
+            "https://mail.google.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Gmail opened.</div>";
+        return;
+    }}
+
+    if (id === "drive") {{
+        window.open(
+            "https://drive.google.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Google Drive opened.</div>";
+        return;
+    }}
+
+    if (id === "docs") {{
+        window.open(
+            "https://docs.google.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Google Docs opened.</div>";
+        return;
+    }}
+
+    if (id === "sheets") {{
+        window.open(
+            "https://sheets.google.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Google Sheets opened.</div>";
+        return;
+    }}
+
+    if (id === "teams") {{
+        window.open(
+            "https://teams.microsoft.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Microsoft Teams opened.</div>";
+        return;
+    }}
+
+    if (id === "outlook") {{
+        window.open(
+            "https://outlook.live.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Outlook opened.</div>";
+        return;
+    }}
+
+    if (id === "onedrive") {{
+        window.open(
+            "https://onedrive.live.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>OneDrive opened.</div>";
+        return;
+    }}
+
+    if (id === "office") {{
+        window.open(
+            "https://www.office.com/",
+            "_blank",
+            "noopener,noreferrer"
+        );
+        body.innerHTML =
+            "<div class='result'>Microsoft 365 opened.</div>";
+        return;
+    }}
+
+    if (id === "browser_info") {{
+
+        body.innerHTML = `
+
+            <div class="result">
+                User Agent:
+                ${{escapeHtml(navigator.userAgent)}}
+
+                <br><br>
+
+                Language:
+                ${{escapeHtml(navigator.language)}}
+
+                <br><br>
+
+                Platform:
+                ${{escapeHtml(navigator.platform)}}
+
+                <br><br>
+
+                Online:
+                ${{navigator.onLine}}
+
+            </div>
+        `;
+
+        return;
+    }}
+
+    if (id === "screen_info") {{
+
+        body.innerHTML = `
+
+            <div class="result">
+                Screen:
+                ${{screen.width}} × ${{screen.height}}
+
+                <br><br>
+
+                Window:
+                ${{window.innerWidth}} ×
+                ${{window.innerHeight}}
+
+                <br><br>
+
+                Device Pixel Ratio:
+                ${{window.devicePixelRatio}}
+            </div>
+        `;
+
+        return;
+    }}
+
+    if (id === "fullscreen") {{
+
+        body.innerHTML = `
+
+            <button
+                id="fullscreenButton"
+                class="tool-button"
+            >
+                Toggle Fullscreen
+            </button>
+        `;
+
+        body.querySelector(
+            "#fullscreenButton"
+        ).onclick = () => {{
+
+            if (!document.fullscreenElement)
+                document.documentElement.requestFullscreen();
+            else
+                document.exitFullscreen();
+        }};
+
+        return;
+    }}
+
+    if (id === "bridge_status") {{
+
+        body.innerHTML = `
+
+            <button
+                id="bridgeCheck"
+                class="tool-button"
+            >
+                Check Bridge
+            </button>
+
+            <div
+                id="bridgeResult"
+                class="result"
+            >
+                Not checked.
+            </div>
+        `;
+
+        body.querySelector(
+            "#bridgeCheck"
+        ).onclick = async () => {{
+
+            const result =
+                body.querySelector(
+                    "#bridgeResult"
+                );
+
+            try {{
+
+                const response =
+                    await fetch(
+                        BRIDGE + "/health"
+                    );
+
+                const data =
+                    await response.json();
+
+                result.textContent =
+                    JSON.stringify(
+                        data,
+                        null,
+                        2
+                    );
+
+            }} catch(e) {{
+
+                result.textContent =
+                    "Bridge unavailable.";
+            }}
+        }};
+
+        return;
+    }}
+
+    if (id === "ai_chat") {{
+
+        body.innerHTML = `
+
+            <textarea
+                id="aiInput"
+                class="tool-input"
+                style="height:140px"
+                placeholder="Ask the AI anything..."
+            ></textarea>
+
+            <button
+                id="aiButton"
+                class="tool-button"
+            >
+                Ask AI
+            </button>
+
+            <div
+                id="aiResult"
+                class="result"
+            ></div>
+        `;
+
+        body.querySelector(
+            "#aiButton"
+        ).onclick = async () => {{
+
+            const input =
+                body.querySelector(
+                    "#aiInput"
+                ).value.trim();
+
+            const result =
+                body.querySelector(
+                    "#aiResult"
+                );
+
+            if (!input) return;
+
+            result.textContent =
+                "Thinking...";
+
+            try {{
+
+                const response =
+                    await fetch(
+                        BRIDGE + "/command",
+                        {{
+                            method:"POST",
+                            headers:{{
+                                "Content-Type":
+                                    "application/json"
+                            }},
+                            body:JSON.stringify({{
+                                command:input
+                            }})
+                        }}
+                    );
+
+                const data =
+                    await response.json();
+
+                result.textContent =
+                    data.text
+                    || data.message
+                    || data.error
+                    || "No response.";
+
+            }} catch(e) {{
+
+                result.textContent =
+                    "Could not connect to the local AI bridge.";
+            }}
+        }};
+
+        return;
+    }}
+
+    // Generic widgets
+
+    body.innerHTML = `
+
+        <div class="result">
+            <strong>${{widgetTitle(id)}}</strong>
+
+            <br><br>
+
+            This widget is installed and ready
+            for the AI Playground command system.
+
+            <br><br>
+
+            You can also type a natural-language
+            command into the main search bar.
+        </div>
+    `;
+}}
+
+function widgetTitle(id) {{
+
+    const widget =
+        WIDGETS.find(x => x.id === id);
+
+    return widget
+        ? escapeHtml(widget.name)
+        : "Widget";
+}}
+
+function formatStopwatch(ms) {{
+
+    const total =
+        Math.floor(ms);
+
+    const minutes =
+        Math.floor(total / 60000);
+
+    const seconds =
+        Math.floor(
+            (total % 60000) / 1000
+        );
+
+    const millis =
+        total % 1000;
+
+    return (
+        String(minutes).padStart(2,"0")
+        + ":"
+        + String(seconds).padStart(2,"0")
+        + "."
+        + String(millis).padStart(3,"0")
+    );
+}}
+
+function escapeHtml(value) {{
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}}
+
+async function sendNaturalCommand(command) {{
+
+    if (!command.trim()) return;
+
+    try {{
+
+        const response =
+            await fetch(
+                BRIDGE + "/command",
+                {{
+                    method:"POST",
+                    headers:{{
+                        "Content-Type":
+                            "application/json"
+                    }},
+                    body:JSON.stringify({{
+                        command
+                    }})
+                }}
+            );
+
+        const data =
+            await response.json();
+
+        if (data.widget) {{
+
+            openWidget(data.widget);
+
+            showToast(
+                data.message
+                || "Opening widget."
+            );
+
+            return;
+        }}
+
+        if (data.text) {{
+
+            const win =
+                document.createElement("div");
+
+            win.className =
+                "widget-window";
+
+            win.innerHTML = `
+
+                <div class="window-head">
+
+                    <div class="window-title">
+                        AI Response
+                    </div>
+
+                    <button class="close">
+                        ×
+                    </button>
+
+                </div>
+
+                <div class="result">
+                    ${{escapeHtml(data.text)}}
+                </div>
+            `;
+
+            workspace.appendChild(win);
+
+            win.querySelector(".close")
+                .onclick = () => win.remove();
+
+            requestAnimationFrame(
+                () => centerWindow(win)
+            );
+
+            return;
+        }
+
+        showToast(
+            data.error
+            || "No result."
+        );
+
+    }} catch(e) {{
+
+        showToast(
+            "AI bridge is offline."
+        );
+    }}
+}}
+
+search.addEventListener(
+    "keydown",
+    event => {{
+
+        if (
+            event.key === "Enter"
+            && search.value.trim()
+        ) {{
+
+            const command =
+                search.value.trim();
+
+            const direct =
+                WIDGETS.find(
+                    x =>
+                        x.name.toLowerCase()
+                        === command.toLowerCase()
+                );
+
+            if (direct) {{
+
+                openWidget(direct.id);
+
+            }} else {{
+
+                sendNaturalCommand(command);
+            }}
+
+        }}
+
+        if (event.key === "Escape") {{
+            search.value = "";
+            render();
+        }}
+    }}
+);
+
+search.addEventListener(
+    "input",
+    render
+);
+
+document.getElementById(
+    "bridgeBtn"
+).onclick = async () => {{
+
+    try {{
+
+        const response =
+            await fetch(
+                BRIDGE + "/health"
+            );
+
+        const data =
+            await response.json();
+
+        document.getElementById(
+            "statusDot"
+        ).classList.add("online");
+
+        document.getElementById(
+            "statusText"
+        ).textContent =
+            "Bridge online";
+
+        showToast(
+            "AI bridge connected"
+        );
+
+    }} catch(e) {{
+
+        document.getElementById(
+            "statusDot"
+        ).classList.remove("online");
+
+        document.getElementById(
+            "statusText"
+        ).textContent =
+            "Bridge offline";
+
+        showToast(
+            "AI bridge unavailable"
+        );
+    }}
+}};
+
+document.getElementById(
+    "settingsBtn"
+).onclick = () => {{
+
+    const win =
+        document.createElement("div");
+
+    win.className =
+        "widget-window";
+
+    win.innerHTML = `
+
+        <div class="window-head">
+
+            <div class="window-title">
+                Settings
+            </div>
+
+            <button class="close">
+                ×
+            </button>
+
+        </div>
+
+        <label style="font-size:12px;color:#8e98aa">
+            Local AI Bridge
+        </label>
+
+        <input
+            id="bridgeInput"
+            class="tool-input"
+            value="${{escapeHtml(BRIDGE)}}"
+        >
+
+        <button
+            id="saveBridge"
+            class="tool-button"
+        >
+            Save
+        </button>
+
+        <div class="result">
+            The API key is intentionally not stored
+            in the public frontend.
+        </div>
+    `;
+
+    workspace.appendChild(win);
+
+    win.querySelector(".close")
+        .onclick = () => win.remove();
+
+    win.querySelector("#saveBridge")
+        .onclick = () => {{
+
+            const value =
+                win.querySelector(
+                    "#bridgeInput"
+                ).value.trim();
+
+            if (!value) return;
+
+            localStorage.setItem(
+                "ai_playground_bridge",
+                value
+            );
+
+            showToast(
+                "Bridge URL saved"
+            );
+
+            win.remove();
+        }};
+
+    requestAnimationFrame(
+        () => centerWindow(win)
+    );
+}};
+
+buildSidebar();
+render();
+
+</script>
+
+</body>
+</html>
